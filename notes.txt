@@ -1,4 +1,39 @@
 New Java 
 - new date and time
 - microservices
+- chef - puppet
 - reactive Java - event bus
+- guice
+
+Microservices
+
+Lots of small idependently deployed services which receive and emit events. The events must be at a similar level of abstraction as the services themseleves as the services must understand what the events mean. Events are very popular with microservices (see CQRS). I also like events, and have liked for example that an XML document can be converted to a stream of SAX events.
+
+A nice trend is developing which is blending software architecture with software design. 
+
+ARCHITECTURE IS SOFTWARE
+Software architectures are deployed in containers which themseleves are defined by code and checked into source control systems. Also tools like puppet and chef allow code / configuration to fully control production servers. The push to cloud services has mandated that developers get more direct and automated control over the infrastructure which runs the software.
+
+SERVICES ARE SOFTWARE COMPONENTS AS ARCHITECTURE
+Microservices provide an API to a small part of an application (domain). Anyone can call the microservice to perform operations or query data from it. Microservices are replacing the concept of the semantic web and replacing it with the programmable web. Meaning that is is very easy (logically)  to integrate a microservice half a world away into an appllication by simply adressing it like any other.
+
+When designing an application with micro services, time, thought and care must be given to consider what the services should be and what events they should receive and emit. This is a standard part of OOA&OOD where we carve up the problem into nouns and verbs (things and actions).
+
+EG
+A banking application which processes payments and updates accounts and sends out confirmations 
+
+The event approach is really tricky. A confirmation should not have to be sent everytime an account is debited. Therefore the accounts
+service needed to listen to a "paymentInAudited" and then send a "paymentInDebited" event as output, so that the confirmation service can be triggered. 
+
+PaymentsInService
+ - receives paymentInEvent - saves paymentIn in an audit log
+ - sends paymentsInAudited
+
+AccountsService
+ - receive paymentInAudited - debits an account 
+ - sends paymentInDebited 
+
+ConfirmationService
+ -  receives paymentInDebited - sends a confirmation that the debit occurred.
+
+So the account service needs to know the overall flow which it is a part of so that it can generate the right kind of event and this means that business logic is spread throughout the system. This is a clear disadvantage to me of the decentralized event based approach.
